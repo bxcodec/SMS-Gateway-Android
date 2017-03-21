@@ -29,7 +29,7 @@ public class SmsApplication extends Application {
 //            msocket = msocket.io().socket("/phone");
 //            msocket.connect();
             phoneSocket = new Socket(msocket.io(),"/phone");
-            phoneSocket.connect();
+//            phoneSocket.connect();
         }catch (URISyntaxException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
