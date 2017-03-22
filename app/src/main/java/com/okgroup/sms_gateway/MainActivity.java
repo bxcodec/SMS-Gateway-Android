@@ -16,6 +16,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.okgroup.sms_gateway.model.SMSClass;
+
 import org.json.JSONObject;
 
 import io.socket.client.Socket;
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String DELIVERED = "SMS_DELIVERED";
     private BroadcastReceiver sentStatusReceiver, deliveredStatusReceiver;
     private TextView hello;
+    private SMSClass  smsToSend;
 
     private Socket mSocket;
     @Override
@@ -46,8 +50,8 @@ public class MainActivity extends AppCompatActivity {
         mSocket.on(Socket.EVENT_CONNECT_TIMEOUT, onConnectError);
          msg = (EditText) findViewById(R.id.message);
          phone = (EditText) findViewById(R.id.phone_number);
-
         Button btn = (Button) findViewById(R.id.sendBtn);
+        btn.setEnabled(false);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 sendSMS(nomor,pesan);
             }
         });
+
         mSocket.on("send_sms_to_phone",onSendSmsToPhone);
         mSocket.connect();
 
@@ -112,12 +117,15 @@ public class MainActivity extends AppCompatActivity {
                 switch (getResultCode()){
                     case Activity.RESULT_OK:
                         s = "Message Delivered Succesfully";
+                        smsToSend.getSMS().setSent(true);
+                        mSocket.emit("success_delivered_sms",smsToSend);
                         break;
                     case Activity.RESULT_CANCELED:
 
                         break;
                 }
                 hello.setText(s);
+                msg.setText("");
             }
         };
 
@@ -146,15 +154,21 @@ public class MainActivity extends AppCompatActivity {
     private  Emitter.Listener onSendSmsToPhone = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+//                    runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
 
+//                            sendSMS(String phone_number , String message){
                             Log.i("SOCKETTAMVAN","OnSendSMSToPHone");
-                            JSONObject object = (JSONObject) args[0];
-                            Log.i("SOCKETTAMVAN",object.toString());
-                        }
-                    });
+                            Gson gson = new Gson();
+                            JSONObject jsonObject= (JSONObject) args[0];
+                            smsToSend = gson.fromJson(jsonObject.toString(), SMSClass.class);
+//                            JSONObject object = (SMS) args[0];
+                            Log.i("SOCKETTAMVAN",smsToSend.toString());
+                            sendSMS(smsToSend.getSMS().getPhone_number() ,smsToSend.getSMS().getMessage());
+
+//                        }
+//                    });
 
         }
     };
