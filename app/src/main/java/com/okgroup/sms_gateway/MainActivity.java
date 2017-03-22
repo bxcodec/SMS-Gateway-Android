@@ -154,21 +154,14 @@ public class MainActivity extends AppCompatActivity {
     private  Emitter.Listener onSendSmsToPhone = new Emitter.Listener() {
         @Override
         public void call(final Object... args) {
-//                    runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
 
-//                            sendSMS(String phone_number , String message){
                             Log.i("SOCKETTAMVAN","OnSendSMSToPHone");
                             Gson gson = new Gson();
                             JSONObject jsonObject= (JSONObject) args[0];
                             smsToSend = gson.fromJson(jsonObject.toString(), SMSClass.class);
-//                            JSONObject object = (SMS) args[0];
                             Log.i("SOCKETTAMVAN",smsToSend.toString());
                             sendSMS(smsToSend.getSMS().getPhone_number() ,smsToSend.getSMS().getMessage());
 
-//                        }
-//                    });
 
         }
     };
