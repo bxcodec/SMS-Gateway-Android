@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                 String s  = "Message not delivered";
                 switch (getResultCode()){
                     case Activity.RESULT_OK:
-                        s = "Message Delivered Succesfully";
+                        s = "Message Delivered Succesfully to " + smsToSend.getSMS().getPhone_number() ;
                         smsToSend.getSMS().setSent(true);
                         mSocket.emit("success_delivered_sms",smsToSend);
                         break;
